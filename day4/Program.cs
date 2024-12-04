@@ -36,7 +36,6 @@ namespace day4
                         if (search[i + 1][j+1] == 'M' && search[i + 2][j + 2] == 'A' &&  search[i + 3][j + 3] == 'S')
                         {
                             total++;
-                            Console.WriteLine("A");
                         }
                     }
                     if (line[j] == 'X' && j >= 3 && i >= 3)
@@ -44,7 +43,6 @@ namespace day4
                         if (search[i - 1][j - 1] == 'M' && search[i - 2][j - 2] == 'A' && search[i - 3][j - 3] == 'S')
                         {
                             total++;
-                            Console.WriteLine("B");
                         }
                         
                     }
@@ -53,7 +51,6 @@ namespace day4
                         if (search[i - 1][j + 1] == 'M' && search[i - 2][j + 2] == 'A' && search[i - 3][j + 3] == 'S')
                         {
                             total++;
-                            Console.WriteLine("A");
                         }
                     }
                     if (line[j] == 'X' && j >= 3 && i < search.Count-3)
@@ -61,7 +58,6 @@ namespace day4
                         if (search[i + 1][j - 1] == 'M' && search[i + 2][j - 2] == 'A' && search[i + 3][j - 3] == 'S')
                         {
                             total++;
-                            Console.WriteLine("B");
                         }
 
                     }
@@ -70,7 +66,6 @@ namespace day4
                         if (search[i -1][j] == 'M' && search[i - 2][j] == 'A' && search[i - 3][j] == 'S')
                         {
                             total++;
-                            Console.WriteLine("C");
                         }
                         
                     }
@@ -79,7 +74,6 @@ namespace day4
                         if (search[i + 1][j] == 'M' && search[i + 2][j] == 'A' && search[i + 3][j] == 'S')
                         {
                             total++;
-                            Console.WriteLine("D");
                         }
                         
                     }
