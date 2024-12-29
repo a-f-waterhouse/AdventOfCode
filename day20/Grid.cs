@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace day16_attempt2
+namespace day20
 {
     public struct Coords
     {
         public int x;
         public int y;
-        public char dir;
+        public int distanceFromStart;
     }
 
     public class Grid
@@ -20,15 +20,30 @@ namespace day16_attempt2
 
         public Grid(string[] filesLines) //square
         {
-            
+
             size = filesLines.Length;
             grid = new char[size, size];
             for (int y = 0; y < size; y++)
             {
-                for(int x = 0; x < size; x++)
+                for (int x = 0; x < size; x++)
                 {
-                    
-                    grid[x,y] = filesLines[y][x];
+
+                    grid[x, y] = filesLines[y][x];
+                }
+            }
+
+        }
+
+        public Grid(int Isize) //square
+        {
+            size = Isize;
+            grid = new char[size, size];
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+
+                    grid[x, y] = '.';
                 }
             }
         }
@@ -38,7 +53,16 @@ namespace day16_attempt2
             return grid[c.x, c.y];
         }
 
-
+        public bool withinBounds(Coords c)
+        {
+            int x = c.x;
+            int y = c.y;
+            if (x >= 0 && x < size && y >= 0 && y < size)
+            {
+                return true;
+            }
+            return false;
+        }
         public void Display(List<Coords> highlight)
         {
             for (int i = 0; i < size; i++)
@@ -59,7 +83,6 @@ namespace day16_attempt2
             }
             Console.WriteLine();
         }
-
 
         public void Display()
         {

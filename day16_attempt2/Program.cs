@@ -12,37 +12,38 @@ namespace day16_attempt2
 {
     internal class Program
     {
-        static List<Coords> D(Grid map, ref int result, char startDir, ref char endDir)
+        static int D(Grid map)
         {
             Coords start = map.CoordsOf('S');
             Coords end = map.CoordsOf('E');
             List<Coords> points = new List<Coords>();
-            Dictionary<Coords, Coords> prevs = new Dictionary<Coords, Coords>();
+            Dictionary<Coords, List<Coords>> prevs = new Dictionary<Coords, List<Coords>>();
             Dictionary<Coords, char> dirs = new Dictionary<Coords, char>();
             Dictionary<Coords, int> dists = new Dictionary<Coords, int>();
             points = map.CoordsOf('.', true);
-            Coords dummy = new Coords();
-            dummy.x = -1;
-            dummy.y = -1;
+
             for (int i = 0; i < points.Count; i++)
             {
-                prevs.Add(points[i], dummy);
+                prevs.Add(points[i], new List<Coords>());
                 dirs.Add(points[i], '.');
                 dists.Add(points[i], 1000000000);
             }
             Queue<Coords> queue = new Queue<Coords>();
+
             queue.Enqueue(start);
+            //prevs.Add(start, new List<Coords>());
             dists[start] = 0;
-            dirs[start] = startDir;
-            prevs.Add(end, dummy);
+            dirs[start] = 'E';
+
             dirs.Add(end, '.');
             dists.Add(end, 1000000000);
-
+            prevs.Add(end, new List<Coords>());
             while (queue.Count > 0)
-            {
+            {                
                 Coords current = queue.Dequeue();
                 Coords test = current;
-                //Console.WriteLine(queue.Count);
+
+                Console.WriteLine(current.x + " " + current.y + " " + dists[current] + " " + prevs[current].Count);
 
                 test.x--;
                 if (map.Element(test) != '#') //
@@ -52,11 +53,14 @@ namespace day16_attempt2
                     {
                         newDist += 1000;
                     }
-
-                    if (newDist < dists[test])
+                    if(newDist < dists[test])
+                    {
+                        prevs[test].Clear();
+                    }
+                    if (newDist <= dists[test])
                     {
                         dists[test] = newDist;
-                        prevs[test] = current;
+                        prevs[test].Add( current);
                         dirs[test] = 'W';
                         queue.Enqueue(test);
                     }
@@ -69,11 +73,16 @@ namespace day16_attempt2
                     {
                         newDist += 1000;
                     }
-
                     if (newDist < dists[test])
                     {
+                        prevs[test].Clear();
+                    }
+
+
+                    if (newDist <= dists[test])
+                    {
                         dists[test] = newDist;
-                        prevs[test] = current;
+                        prevs[test].Add( current);
                         dirs[test] = 'E';
                         queue.Enqueue(test);
                     }
@@ -89,8 +98,13 @@ namespace day16_attempt2
                     }
                     if (newDist < dists[test])
                     {
+                        prevs[test].Clear();
+                    }
+
+                    if (newDist <= dists[test])
+                    {
                         dists[test] = newDist;
-                        prevs[test] = current;
+                        prevs[test].Add( current);
                         dirs[test] = 'S';
                         queue.Enqueue(test);
                     }
@@ -103,92 +117,54 @@ namespace day16_attempt2
                     {
                         newDist += 1000;
                     }
-
                     if (newDist < dists[test])
                     {
+                        prevs[test].Clear();
+                    }
+
+                    if (newDist <= dists[test])
+                    {
                         dists[test] = newDist;
-                        prevs[test] = current;
+                        prevs[test].Add( current);
                         dirs[test] = 'N';
                         queue.Enqueue(test);
                     }
                 }
             }
-            Coords cur = end;
-            List<Coords> path = new List<Coords>();
 
-            while ((cur.x != start.x || cur.y != start.y) && (cur.x != -1))
+            List<Coords> onPath = new List<Coords>();
+            backtrack(end,prevs,ref onPath);
+            Console.WriteLine(onPath.Count);
+            return dists[end];
+        }
+
+        static List<Coords> backtrack(Coords end, Dictionary<Coords, List<Coords>> prevs, ref List<Coords> count)
+        {
+            Console.WriteLine("Backtracking from: " + end.x + " " + end.y);
+            Console.WriteLine("Prevs count: " + prevs[end].Count);
+            foreach (Coords c in prevs[end])
             {
-                //Console.WriteLine(prevs[cur].x + " " + prevs[cur].y);
-                cur = prevs[cur];
-                path.Add(cur);
-            }
+                Console.Write(c.x + " " + c.y + "   ");
 
-            Console.WriteLine(dists[end]);
-            result = dists[end];
-            endDir = dirs[end];
-            if (cur.x == -1)
-            {
-                return new List<Coords>();
             }
+            Console.WriteLine();
+            foreach (Coords c in prevs[end])
+            {                
+                if (!count.Contains(c))
+                {
+                    count.Add(c);
+                    backtrack(c, prevs, ref count);
+                }
 
-            return path;
+            }
+            return count;
         }
 
 
         static void Main(string[] args)
         {
-            Grid map = new Grid(File.ReadAllLines("input.txt"));
-            Coords start = map.CoordsOf('S');
-            Coords end = map.CoordsOf('E');
-
-            int goal = 0;
-            char aaaa = ' ';
-            D(map, ref goal, 'E', ref aaaa);
-            Console.WriteLine("GOAL: " + goal);
-            List<Coords> allPoints = new List<Coords>();
-            allPoints = map.CoordsOf('.', true);
-            int count = 0;
-
-            foreach (Coords c in allPoints)
-            {
-                Console.WriteLine("Testing: " + c.x + " " + c.y);
-                map.grid[c.x, c.y] = 'E';
-                map.grid[start.x, start.y] = 'S';
-                map.grid[end.x, end.y] = '.';
-                int distToC = 0;
-                char endDir = ' ';
-                D(map, ref distToC, 'E', ref endDir);
-                map.grid[c.x, c.y] = 'S';
-                map.grid[end.x, end.y] = 'E';
-                map.grid[start.x, start.y] = '.';
-                int distFromC = 0;
-                char dummy = ' ';
-                D(map, ref distFromC, endDir, ref dummy);
-                map.grid[c.x, c.y] = '.';
-                Console.WriteLine(distToC + " " + distFromC);
-                if(distToC + distFromC == goal)
-                {
-                    count++;
-                }
-            }
-            Console.WriteLine(count);
-
-
-
-
-
-
-           /* for (int i = 0; i < path.Count; i++)
-            {
-                seats.Add(path[i]);
-            }
-            foreach (Coords c in path)
-            {
-                if (!(c.x == start.x && c.y == start.y))
-                {
-                    //explore(c, map, ref seats, r, start);
-                }
-            }*/
+            Grid maze = new Grid(File.ReadAllLines("input.txt"));
+            Console.WriteLine(D(maze));
             Console.ReadKey();
         }
 
